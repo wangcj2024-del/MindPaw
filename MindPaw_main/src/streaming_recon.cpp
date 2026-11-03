@@ -74,7 +74,9 @@ bool StreamingReconClient::_postFrame(const uint8_t* jpegBytes, size_t jpegLen, 
     _http.begin(_tcpClient, url);
     _http.setTimeout(RECON_DEFAULT_TIMEOUT_MS);
     if (_token.length() > 0) {
-        _http.setAuthorization("Bearer " _token.c_str());
+        String authHeader = String("Bearer ") + _token;
+        _http.setAuthorization( authHeader.c_str());
+        //_http.setAuthorization("Bearer " + _token);
         // 注: setAuthorization 接受 user/pass; 上面写法对 ESP8266HTTPClient
         // 是合法构造；下面用 addHeader 更稳。
     }
