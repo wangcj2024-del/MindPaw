@@ -135,6 +135,16 @@ void ICACHE_RAM_ATTR handleButtonPress()
         lastPressTime2 = currentTime2; // 更新按钮2的最后有效按下时间
     }
 }
+static void sendHtmlPage(AsyncWebServerRequest *request, const char *path)
+{
+    if (SPIFFS.exists(path)) {
+        request->send(SPIFFS, path, "text/html; charset=utf-8");
+        return;
+    }
+
+    request->send(404, "text/plain", "File Not Found");
+}
+
 //---------------配置页面路由--------------------------
 void handleWiFiConfig()
 {
@@ -351,33 +361,11 @@ server.on("/front", HTTP_GET, [](AsyncWebServerRequest *request) {// 当访问 /
 
     // AI 聊天页面
     server.on("/aichat.html", HTTP_GET, [](AsyncWebServerRequest *request)
-              {
-        if (SPIFFS.exists("/aichat.html")) {
-            fs::File file = SPIFFS.open("/aichat.html", "r");
-            if (file) {
-                String content;
-                while (file.available()) content += (char)file.read();
-                file.close();
-                request->send(200, "text/html", content);
-                return;
-            }
-        }
-        request->send(404, "text/plain", "File Not Found"); });
+              { sendHtmlPage(request, "/aichat.html"); });
 
     // AI 配置页面
     server.on("/aiconfig.html", HTTP_GET, [](AsyncWebServerRequest *request)
-              {
-        if (SPIFFS.exists("/aiconfig.html")) {
-            fs::File file = SPIFFS.open("/aiconfig.html", "r");
-            if (file) {
-                String content;
-                while (file.available()) content += (char)file.read();
-                file.close();
-                request->send(200, "text/html", content);
-                return;
-            }
-        }
-        request->send(404, "text/plain", "File Not Found"); });
+              { sendHtmlPage(request, "/aiconfig.html"); });
     server.on("/dowhatstate", HTTP_GET, [](AsyncWebServerRequest *request)
               {
        emojiState = 3;  // 设置标志，执行舵机动作
@@ -450,173 +438,23 @@ request->send(200, "text/html; charset=UTF-8",
    );
 
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
-              {
-        // 检查SPIFFS文件系统中是否存在index.html文件
-        if (SPIFFS.exists("/index.html")) {
-            fs::File file = SPIFFS.open("/index.html", "r");  // 打开index.html文件
-            if (file) {
-                size_t fileSize = file.size();  // 获取文件大小
-                String fileContent;
-
-                // 逐字节读取文件内容
-                while (file.available()) {
-                    fileContent += (char)file.read();
-                }
-                file.close();  // 关闭文件
-
-                // 返回HTML内容
-                request->send(200, "text/html", fileContent);
-                return;
-            }
-        }
-        // 如果文件不存在，返回404错误
-        request->send(404, "text/plain", "File Not Found"); });
+              { sendHtmlPage(request, "/index.html"); });
     server.on("/control.html", HTTP_GET, [](AsyncWebServerRequest *request)
-              {
-        // 检查SPIFFS文件系统中是否存在index.html文件
-        if (SPIFFS.exists("/control.html")) {
-            fs::File file = SPIFFS.open("/control.html", "r");  // 打开index.html文件
-            if (file) {
-                size_t fileSize = file.size();  // 获取文件大小
-                String fileContent;
-
-                // 逐字节读取文件内容
-                while (file.available()) {
-                    fileContent += (char)file.read();
-                }
-                file.close();  // 关闭文件
-
-                // 返回HTML内容
-                request->send(200, "text/html", fileContent);
-                return;
-            }
-        }
-        // 如果文件不存在，返回404错误
-        request->send(404, "text/plain", "File Not Found"); });
+              { sendHtmlPage(request, "/control.html"); });
     server.on("/motion.html", HTTP_GET, [](AsyncWebServerRequest *request)
-              {
-        if (SPIFFS.exists("/motion.html")) {
-            fs::File file = SPIFFS.open("/motion.html", "r");
-            if (file) {
-                size_t fileSize = file.size();
-                String fileContent;
-                while (file.available()) {
-                    fileContent += (char)file.read();
-                }
-                file.close();
-                request->send(200, "text/html", fileContent);
-                return;
-            }
-        }
-        request->send(404, "text/plain", "File Not Found"); });
+              { sendHtmlPage(request, "/motion.html"); });
     server.on("/expression.html", HTTP_GET, [](AsyncWebServerRequest *request)
-              {
-        if (SPIFFS.exists("/expression.html")) {
-            fs::File file = SPIFFS.open("/expression.html", "r");
-            if (file) {
-                size_t fileSize = file.size();
-                String fileContent;
-                while (file.available()) {
-                    fileContent += (char)file.read();
-                }
-                file.close();
-                request->send(200, "text/html", fileContent);
-                return;
-            }
-        }
-        request->send(404, "text/plain", "File Not Found"); });
+              { sendHtmlPage(request, "/expression.html"); });
     server.on("/network.html", HTTP_GET, [](AsyncWebServerRequest *request)
-              {
-        if (SPIFFS.exists("/network.html")) {
-            fs::File file = SPIFFS.open("/network.html", "r");
-            if (file) {
-                size_t fileSize = file.size();
-                String fileContent;
-                while (file.available()) {
-                    fileContent += (char)file.read();
-                }
-                file.close();
-                request->send(200, "text/html", fileContent);
-                return;
-            }
-        }
-        request->send(404, "text/plain", "File Not Found"); });
+              { sendHtmlPage(request, "/network.html"); });
     server.on("/home.html", HTTP_GET, [](AsyncWebServerRequest *request)
-              {
-        if (SPIFFS.exists("/home.html")) {
-            fs::File file = SPIFFS.open("/home.html", "r");
-            if (file) {
-                size_t fileSize = file.size();
-                String fileContent;
-                while (file.available()) {
-                    fileContent += (char)file.read();
-                }
-                file.close();
-                request->send(200, "text/html", fileContent);
-                return;
-            }
-        }
-        request->send(404, "text/plain", "File Not Found"); });
+              { sendHtmlPage(request, "/home.html"); });
     server.on("/egg.html", HTTP_GET, [](AsyncWebServerRequest *request)
-              {
-        if (SPIFFS.exists("/egg.html")) {
-            fs::File file = SPIFFS.open("/egg.html", "r");
-            if (file) {
-                size_t fileSize = file.size();
-                String fileContent;
-                while (file.available()) {
-                    fileContent += (char)file.read();
-                }
-                file.close();
-                request->send(200, "text/html", fileContent);
-                return;
-            }
-        }
-        request->send(404, "text/plain", "File Not Found"); });
+              { sendHtmlPage(request, "/egg.html"); });
     server.on("/engine.html", HTTP_GET, [](AsyncWebServerRequest *request)
-              {
-        // 检查SPIFFS文件系统中是否存在index.html文件
-        if (SPIFFS.exists("/engine.html")) {
-            fs::File file = SPIFFS.open("/engine.html", "r");  // 打开index.html文件
-            if (file) {
-                size_t fileSize = file.size();  // 获取文件大小
-                String fileContent;
-
-                // 逐字节读取文件内容
-                while (file.available()) {
-                    fileContent += (char)file.read();
-                }
-                file.close();  // 关闭文件
-
-                // 返回HTML内容
-                request->send(200, "text/html", fileContent);//发送文件内容
-                return;
-            }
-        }
-        // 如果文件不存在，返回404错误
-        request->send(404, "text/plain", "File Not Found"); });
+              { sendHtmlPage(request, "/engine.html"); });
     server.on("/setting.html", HTTP_GET, [](AsyncWebServerRequest *request)
-              {
-        // 检查SPIFFS文件系统中是否存在index.html文件
-        if (SPIFFS.exists("/setting.html")) {
-            fs::File file = SPIFFS.open("/setting.html", "r");  // 打开index.html文件
-            if (file) {
-                size_t fileSize = file.size();  // 获取文件大小
-                String fileContent;
-
-                // 逐字节读取文件内容
-                while (file.available()) {
-                    fileContent += (char)file.read();
-                }
-                file.close();  // 关闭文件
-
-                // 返回HTML内容
-                request->send(200, "text/html", fileContent);
-                return;
-            }
-        }
-        // 如果文件不存在，返回404错误
-        request->send(404, "text/plain", "File Not Found"); });
+              { sendHtmlPage(request, "/setting.html"); });
 
     // ============================================================
     // 2.0: 流式 3D 重建感知层 endpoints (不破坏 1.0 任何 handler)
@@ -651,17 +489,7 @@ request->send(200, "text/html; charset=UTF-8",
 
     // 浏览器查看器入口 (与 recon_view.html SPIFFS handler 平行; 两者都可访问)
     server.on("/recon_view.html", HTTP_GET, [](AsyncWebServerRequest *request) {
-        if (SPIFFS.exists("/recon_view.html")) {
-            fs::File file = SPIFFS.open("/recon_view.html", "r");
-            if (file) {
-                String content;
-                while (file.available()) content += (char)file.read();
-                file.close();
-                request->send(200, "text/html", content);
-                return;
-            }
-        }
-        request->send(404, "text/plain", "File Not Found");
+        sendHtmlPage(request, "/recon_view.html");
     });
 
     // 启动服务器

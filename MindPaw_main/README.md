@@ -87,7 +87,7 @@ pio run -t uploadfs
 | 现象 | 优先检查 |
 |------|---------|
 | 编译找不到库 | PlatformIO 是否打开了 `MindPaw_main`，重新执行 `pio run` |
-| 网页 404 | 是否执行 `pio run -t uploadfs`，是否重新断电启动 |
+| 网页 404、乱码或无法打开 | 重新烧录固件并执行 `pio run -t uploadfs`，确认 `data` 下网页文件为 UTF-8，再重启设备 |
 | 无法烧录 | GPIO0 接地、TX/RX 交叉、USB-TTL 使用 3.3V |
 | ESP 不启动 | GPIO15 必须 10KΩ 下拉到 GND，舵机不要由 3.3V 供电 |
 | 舵机抖动/重启 | 舵机使用独立 5V 供电并与 ESP 共地 |
